@@ -62,6 +62,19 @@
     "deviations": "偏离",
     "retest_issues": "复检问题",
     "blocked": "阻断项",
-    "status": "状态"
+    "status": "状态",
+    "signer": "签署人",
+    "role": "角色",
+    "signed_at": "签署时刻",
+    "validity": "有效性",
+    "reason": "阻断原因",
+    "chain_id": "签署链",
+    "seal": "冻结印鉴",
+    "created_at": "形成时刻",
+    "state": "状态",
+    "holder": "持有人",
+    "granted_at": "授权时刻",
+    "revoked_at": "撤销时刻",
+    "signers": "放行签署"
   }
 }

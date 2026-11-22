@@ -1,0 +1,41 @@
+{% macro chain_panels(state) %}
+{% set chain = state.chain %}
+<section class="panel">
+  <div class="panel__head"><h2>当前可用版本</h2><span>{{ '可放行' if chain.freeze else '阻断中' }}</span></div>
+  {% if chain.freeze %}
+  <div class="table-frame"><table><tbody>
+    <tr><th>签署链</th><td>{{ chain.freeze.chain_id }}</td></tr>
+    <tr><th>冻结印鉴</th><td>{{ chain.freeze.seal[:16] }}…</td></tr>
+    <tr><th>放行签署</th><td>{{ chain.freeze.signers|join('、') }}</td></tr>
+    <tr><th>形成时刻</th><td>{{ chain.freeze.created_at }}</td></tr>
+  </tbody></table></div>
+  {% else %}
+  <div class="table-frame"><table><tbody>
+    {% for b in chain.active.blocks %}<tr><td>{{ b }}</td></tr>{% else %}<tr><td>当前无可放行版本。</td></tr>{% endfor %}
+  </tbody></table></div>
+  {% endif %}
+</section>
+<section class="panel">
+  <div class="panel__head"><h2>签署记录</h2><span>{{ chain.signatures|length }} 条 · 原始签署留存</span></div>
+  <div class="table-frame"><table>
+    <thead><tr><th>签署人</th><th>角色</th><th>签署时刻</th><th>有效性</th><th>阻断原因</th></tr></thead>
+    <tbody>{% for s in chain.signatures %}<tr>
+      <td>{{ s.signer }}</td><td>{{ s.role }}</td><td>{{ s.signed_at }}</td>
+      <td><span class="visit-state {{ 'pass' if s.valid else 'warn' }}">{{ s.validity }}</span></td>
+      <td>{{ s.reason or '—' }}</td>
+    </tr>{% else %}<tr><td>当前无签署记录。</td></tr>{% endfor %}</tbody>
+  </table></div>
+</section>
+{% if chain.freeze_history %}
+<section class="panel">
+  <div class="panel__head"><h2>冻结留存</h2><span>{{ chain.freeze_history|length }} 条 · 仅供回看</span></div>
+  <div class="table-frame"><table>
+    <thead><tr><th>签署链</th><th>放行签署</th><th>形成时刻</th><th>状态</th><th>留存原因</th></tr></thead>
+    <tbody>{% for f in chain.freeze_history %}<tr>
+      <td>{{ f.chain_id }}</td><td>{{ f.signers|join('、') }}</td><td>{{ f.created_at }}</td>
+      <td>{{ f.state }}</td><td>{{ f.reason }}</td>
+    </tr>{% endfor %}</tbody>
+  </table></div>
+</section>
+{% endif %}
+{% endmacro %}

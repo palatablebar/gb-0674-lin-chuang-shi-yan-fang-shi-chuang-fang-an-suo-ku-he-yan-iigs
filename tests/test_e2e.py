@@ -8,7 +8,11 @@ def client(tmp_path,monkeypatch):
 def test_api_idempotent(tmp_path,monkeypatch):
     c=client(tmp_path,monkeypatch);a=c.post('/api/runs',json={}).json();b=c.post('/api/runs',json={}).json();assert a['manifest']['run_id']==b['manifest']['run_id'];assert len(c.get('/api/runs').json())==1
 def test_stale_review(tmp_path,monkeypatch):
-    c=client(tmp_path,monkeypatch);a=c.post('/api/runs',json={}).json();url='/api/runs/'+a['manifest']['run_id']+'/review';assert c.post(url,json={'revision':1}).status_code==200;assert c.post(url,json={'revision':1}).status_code==409
+    c=client(tmp_path,monkeypatch);a=c.post('/api/runs',json={}).json();url='/api/runs/'+a['manifest']['run_id']+'/review'
+    assert c.post(url,json={'revision':1,'signer':'复核-甲'}).status_code==200
+    retry=c.post(url,json={'revision':1,'signer':'复核-甲'})
+    assert retry.status_code==200 and len(retry.json()['chain']['signatures'])==1
+    assert c.post(url,json={'revision':99,'signer':'复核-甲'}).status_code==409
 def test_seven_entries(tmp_path,monkeypatch):
     c=client(tmp_path,monkeypatch)
     for k in main.MODULES:

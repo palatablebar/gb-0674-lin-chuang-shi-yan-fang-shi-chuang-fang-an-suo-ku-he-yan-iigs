@@ -13,7 +13,7 @@ docker compose exec -T app pytest -q
 
 各模块页面对应 `/<模块英文名>`，各模块执行入口为 `POST /api/<模块英文名>`，不传参即可独立演示。完整运行 `POST /api/runs` 支持 `dataset`（dirty/clean/legacy）、`csv_text` 与 `overrides` 参数。批次历史 `GET /api/runs`，详情 `GET /api/runs/{run_id}`。
 
-同输入与规则版本生成相同批号，只保留一条批次。复核入口 `POST /api/runs/{run_id}/review` 提交当前 `revision`，陈旧提交409。归档包只有一个下载入口 `GET /api/export/{run_id}`，含证据和运行摘要。原始隔离在页面同屏显示。
+同输入与规则版本生成相同批号，只保留一条批次。复核入口 `POST /api/runs/{run_id}/review` 提交 `revision` 与 `signer`；签署人须持有当前复核授权，每条签署固化签署当时的授权快照。同一复核重试幂等，不新增签署；陈旧提交409。换班 `POST /api/roles/shift`（`from`/`to`）撤销原持有人并授予接任人，名册见 `GET /api/roles`，授权与撤销记录均留存。换班后旧签署转为已失效留存，不再放行；新复核人完成签署形成新链后冻结才放行，旧版冻结转历史留存供回看。访视、方案、复检各页页脚与冻结凭证引用同一 `chain_id`。归档包只有一个下载入口 `GET /api/export/{run_id}`，含证据、签署链和运行摘要。原始隔离在页面同屏显示。
 
 SQLite使用命名卷，容器重启后保留历史。要重建演示可在Compose中改用新的卷名称，保留旧卷。
 
